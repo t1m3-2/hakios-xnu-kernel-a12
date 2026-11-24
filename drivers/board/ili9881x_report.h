@@ -2,9 +2,9 @@
  * ILITEK ILI9881x demo-report decoder for the Galaxy A12.
  *
  * This is a bus-independent parser. The A12 vendor input tree describes a
- * 43-byte demo report with a one-byte prefix followed by ten 4-byte contact
- * slots. Each slot carries packed 12-bit X/Y values; an all-0xff coordinate
- * triplet means the slot is empty. The controller's extended-axis report has
+ * 43-byte demo report with ten 4-byte contact records in its first 40 bytes.
+ * Bytes 1-3 of each record carry packed 12-bit X/Y values; an all-0xff
+ * coordinate triplet means the slot is empty. The controller's extended-axis report has
  * a separate 3-byte header which the caller must strip before decoding.
  * The report is scaled from the controller's 2048 x 2048 coordinate space to
  * the board's display size. The hardware SPI path and controller startup are
@@ -22,7 +22,6 @@
 
 #define ILI9881X_CONTACTS       10u
 #define ILI9881X_SLOT_BYTES     4u
-#define ILI9881X_DEMO_PREFIX    1u
 #define ILI9881X_DEMO_BYTES     43u
 #define ILI9881X_COORD_SCALE    2048u
 
@@ -45,7 +44,7 @@ ili9881x_decode_demo(const uint8_t *packet, unsigned length, unsigned panel_x, u
 	}
 
 	for (unsigned id = 0; id < ILI9881X_CONTACTS; id++) {
-		const uint8_t *slot = packet + ILI9881X_DEMO_PREFIX + id * ILI9881X_SLOT_BYTES;
+		const uint8_t *slot = packet + id * ILI9881X_SLOT_BYTES;
 		uint16_t raw_x, raw_y;
 
 		if (slot[1] == 0xff && slot[2] == 0xff && slot[3] == 0xff) {
