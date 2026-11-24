@@ -13,7 +13,7 @@ Reference sources:
 - [Samsung A12 MT6765 input device tree](https://github.com/ASKSAP/android_kernel_samsung_a12/blob/A125FXXU1AUC3/arch/arm64/boot/dts/mediatek/a12/mt6765_input_a12_common.dtsi)
 - [Samsung A12 ILITEK driver](https://github.com/ASKSAP/android_kernel_samsung_a12/tree/A125FXXU1AUC3/drivers/input/touchscreen/ili9881x)
 
-The Android driver is Linux-specific and cannot be loaded directly by XNU. Porting needs an MTK SPI4/GPIO/interrupt path in the loader or kernel, power/reset sequencing, the right controller firmware, and an XNU multitouch event bridge. This repository does not yet have those MTK services.
+The Android driver is Linux-specific and cannot be loaded directly by XNU. A bus-independent ILI9881x demo-report decoder is now in `drivers/board/ili9881x_report.h`. It turns the vendor's 43-byte ten-contact report into A12-scaled coordinates. It is not yet connected to an SPI transport or the XNU touch event path; MTK SPI4/GPIO/interrupt support, power/reset sequencing, and the controller firmware still need to be brought up.
 
 ## First display path
 
@@ -24,7 +24,8 @@ The first practical screen milestone is a CPU-rendered test pattern into a frame
 ## Current status
 
 - Touch controller family and wiring: identified from the matching Samsung kernel source; not yet exercised outside Android.
-- Touch event parsing: not implemented in XNU.
+- Touch report decoding: implemented as a standalone header, not integrated or hardware-tested.
+- MTK SPI4/GPIO/interrupt path: not implemented in XNU.
 - Framebuffer handoff: not implemented for this phone.
 - PowerVR acceleration: not implemented.
 - No firmware or partitions have been modified.
